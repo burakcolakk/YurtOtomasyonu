@@ -6,11 +6,11 @@ services:
     environment:
       POSTGRES_DB: yurtdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password  # Buraya istediğin şifreyi yaz
+      POSTGRES_PASSWORD: password  # DİKKAT: Test properties dosyasında da bu şifre olmalı!
     ports:
-      - "5432:5432" # Dışarıdan erişim için
+      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data # Veriler kaybolmasın diye volume tanımlıyoruz
+      - pgdata:/var/lib/postgresql/data
     networks:
       - yurt-network
 
@@ -19,10 +19,10 @@ services:
     container_name: yurt-pgadmin
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com # Giriş maili
-      PGADMIN_DEFAULT_PASSWORD: admin      # Giriş şifresi
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:80" # Tarayıcıdan http://localhost:5050 ile gireceksin
+      - "5050:80"
     depends_on:
       - postgres
     networks:
@@ -31,39 +31,35 @@ services:
   # --- 3. Backend (Spring Boot) ---
   backend:
     container_name: yurt-backend
-    build: . # Dockerfile'ı buradan oku
+    build: .
     ports:
-      - "8181:8181"
+      - "8181:8181" # Jenkins 8080'de olduğu için burayı 8181 yapmıştın, DOĞRU.
     environment:
-      # Docker içinde 'localhost' yerine servis adı olan 'postgres' kullanılır!
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/yurtdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
-      # Hibernate ayarı (Tabloları otomatik oluştursun)
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
-      - postgres # DB kalkmadan Backend kalkmasın
+      - postgres
     networks:
       - yurt-network
 
+  # --- 4. Frontend (React) ---
   frontend:
     container_name: yurt-frontend
     build:
-      context: ../yurt-frontend # Backend klasöründen bir üste çıkıp frontend'i bulur
+      context: ../frontend # <--- BURAYI DEĞİŞTİRDİK! (Eskisi: ../yurt-frontend)
       dockerfile: Dockerfile
     ports:
-      - "5173:80" # Tarayıcıdan 5173 ile gireceğiz, içeride Nginx 80'i dinliyor
+      - "5173:80"
     depends_on:
-      - backend # Backend açılmadan Frontend açılmasın
+      - backend
     networks:
       - yurt-network
 
-# Verilerin kalıcı olması için volume tanımı
 volumes:
   pgdata:
 
-# Konteynerlerin birbirini görmesi için ağ tanımı
 networks:
   yurt-network:
     driver: bridge
-
