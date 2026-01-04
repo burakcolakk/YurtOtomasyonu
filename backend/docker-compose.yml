@@ -1,0 +1,69 @@
+services:
+  # --- 1. Veritabanı (PostgreSQL) ---
+  postgres:
+    container_name: yurt-db
+    image: postgres:15
+    environment:
+      POSTGRES_DB: yurtdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password  # Buraya istediğin şifreyi yaz
+    ports:
+      - "5432:5432" # Dışarıdan erişim için
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Veriler kaybolmasın diye volume tanımlıyoruz
+    networks:
+      - yurt-network
+
+  # --- 2. Veritabanı Yönetimi (pgAdmin4) ---
+  pgadmin:
+    container_name: yurt-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com # Giriş maili
+      PGADMIN_DEFAULT_PASSWORD: admin      # Giriş şifresi
+    ports:
+      - "5050:80" # Tarayıcıdan http://localhost:5050 ile gireceksin
+    depends_on:
+      - postgres
+    networks:
+      - yurt-network
+
+  # --- 3. Backend (Spring Boot) ---
+  backend:
+    container_name: yurt-backend
+    build: . # Dockerfile'ı buradan oku
+    ports:
+      - "8181:8181"
+    environment:
+      # Docker içinde 'localhost' yerine servis adı olan 'postgres' kullanılır!
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/yurtdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      # Hibernate ayarı (Tabloları otomatik oluştursun)
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - postgres # DB kalkmadan Backend kalkmasın
+    networks:
+      - yurt-network
+
+  frontend:
+    container_name: yurt-frontend
+    build:
+      context: ../yurt-frontend # Backend klasöründen bir üste çıkıp frontend'i bulur
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80" # Tarayıcıdan 5173 ile gireceğiz, içeride Nginx 80'i dinliyor
+    depends_on:
+      - backend # Backend açılmadan Frontend açılmasın
+    networks:
+      - yurt-network
+
+# Verilerin kalıcı olması için volume tanımı
+volumes:
+  pgdata:
+
+# Konteynerlerin birbirini görmesi için ağ tanımı
+networks:
+  yurt-network:
+    driver: bridge
+
