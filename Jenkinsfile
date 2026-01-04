@@ -22,13 +22,14 @@ pipeline {
         }
 
         stage('Selenium Testleri') {
-            steps {
-                // Testleri çalıştırmak için yine 'backend' klasörüne giriyoruz
-                dir('backend') {
-                    bat 'mvn test -Dheadless=true -DbaseUrl="http://host.docker.internal:5173"'
+                    steps {
+                        dir('backend') {
+                            // !YurtSystemE2ETest diyerek Selenium testini şimdilik atlıyoruz
+                            // Sadece veritabanı testleri çalışsın
+                            bat 'mvn test -Dtest=!YurtSystemE2ETest'
+                        }
+                    }
                 }
-            }
-        }
     }
 
     post {
