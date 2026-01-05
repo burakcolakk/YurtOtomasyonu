@@ -7,26 +7,29 @@ pipeline {
     }
 
     environment {
-        // Docker içinden bilgisayarına erişim adresi
-        BASE_URL = 'http://host.docker.internal:5173'
+        // Jenkins Windows üzerinde çalıştığı için localhost kullanabiliriz
+        // Eğer Selenium kodun bu değişkeni okuyorsa harika, okumuyorsa kodda localhost:5173 olmalı.
+        BASE_URL = 'http://localhost:5173'
     }
 
     stages {
         stage('Backend Derleme') {
             steps {
-                // 'backend' klasörüne girip derleme yapıyoruz
                 dir('backend') {
+                    // Derlerken testleri atlayalım, zaman kazanalım.
+                    // Testleri bir sonraki aşamada zaten yapacağız.
                     bat 'mvn clean install -DskipTests'
                 }
             }
         }
 
-        stage('Selenium Testleri') {
+        stage('Tüm Testler (Unit + Selenium)') {
                     steps {
                         dir('backend') {
-                            // !YurtSystemE2ETest diyerek Selenium testini şimdilik atlıyoruz
-                            // Sadece veritabanı testleri çalışsın
-                            bat 'mvn test -Dtest=!YurtSystemE2ETest'
+                            echo '🚀 Selenium Testleri Headless Modda Başlatılıyor...'
+                            // DİKKAT: "-Dheadless=true" parametresini ekledik!
+                            // Bu parametre Java kodundaki "if (headless)" bloğunu çalıştırır.
+                            bat 'mvn test -Dheadless=true'
                         }
                     }
                 }
@@ -34,7 +37,6 @@ pipeline {
 
     post {
         always {
-            // Raporları toplarken de klasör içine bakıyoruz
             dir('backend') {
                 junit '**/target/surefire-reports/*.xml'
             }

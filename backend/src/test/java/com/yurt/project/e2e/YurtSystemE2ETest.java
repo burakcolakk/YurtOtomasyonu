@@ -1,5 +1,5 @@
 package com.yurt.project.e2e;
-
+import io.github.bonigarcia.wdm.WebDriverManager; // Bu importu ekle
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -21,6 +21,7 @@ public class YurtSystemE2ETest {
 
     @BeforeAll
     void setup() {
+        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
 
