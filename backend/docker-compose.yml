@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: yurtdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password  # DİKKAT: Test properties dosyasında da bu şifre olmalı!
+      POSTGRES_PASSWORD: yurt123  # DİKKAT: Test properties dosyasında da bu şifre olmalı!
     ports:
       - "5432:5432"
     volumes:
@@ -37,7 +37,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/yurtdb
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_PASSWORD: yurt123
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       - postgres
