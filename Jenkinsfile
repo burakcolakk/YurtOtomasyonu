@@ -23,7 +23,7 @@ pipeline {
             }
         }
 
-        stage('Tüm Testler (Unit + Selenium)') {
+        stage('Tüm Testler (Unit + Integration + Selenium)') {
                     steps {
                         dir('backend') {
                             echo '🚀 Selenium Testleri Headless Modda Başlatılıyor...'
