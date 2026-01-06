@@ -11,10 +11,10 @@ pipeline {
     }
 
     stages {
-        stage('Backend Derleme') {
+        stage('Build ') {
             steps {
                 dir('backend') {
-                    echo ' Proje derleniyor (Testler atlanıyor)...'
+                    echo ' Proje build ediliyor (Testler atlanıyor)...'
                     bat 'mvn clean install -DskipTests'
                 }
             }
