@@ -19,6 +19,6 @@ public class AllocationController {
     public ResponseEntity<String> allocateStudent(@Valid @RequestBody AllocationRequest request) {
         allocationService.allocateStudentToBed(request);
         return new ResponseEntity<>("Öğrenci başarıyla odaya yerleştirildi.", HttpStatus.CREATED);
-        //deneme
+        //deneme12
     }
 }
